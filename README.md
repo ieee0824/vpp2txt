@@ -9,11 +9,15 @@
 
 ## インストール
 
+[Releases ページ](https://github.com/ieee0824/vpp2txt/releases/latest)からお使いの OS に合ったバイナリをダウンロードできます。
+
+または `go install` でインストール:
+
 ```bash
 go install github.com/ieee0824/vpp2txt/cmd/vpp2txt@latest
 ```
 
-またはリポジトリをクローンしてビルド:
+リポジトリをクローンしてビルドすることもできます:
 
 ```bash
 git clone https://github.com/ieee0824/vpp2txt.git
