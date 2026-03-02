@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
-const usage = `usage: vpp2txt [options] <input.vpp> [input2.vpp ...]
+const usageJa = `usage: vpp2txt [options] <input.vpp> [input2.vpp ...]
 
 Voice Peak (.vpp) ファイルをテキストに変換します。
 
@@ -19,15 +20,43 @@ options:
   -h              ヘルプを表示
 `
 
+const usageEn = `usage: vpp2txt [options] <input.vpp> [input2.vpp ...]
+
+Convert Voice Peak (.vpp) files to text.
+
+options:
+  -o <file>       output file (default: stdout)
+  -format <type>  output format (default: script)
+                    script  : "speaker: text" format
+                    plain   : text only
+  -h              show help
+`
+
+func isJapanese() bool {
+	for _, key := range []string{"LC_ALL", "LC_MESSAGES", "LANG"} {
+		if v := os.Getenv(key); v != "" {
+			return strings.HasPrefix(strings.ToLower(v), "ja")
+		}
+	}
+	return false
+}
+
+func usageText() string {
+	if isJapanese() {
+		return usageJa
+	}
+	return usageEn
+}
+
 func main() {
-	outputFile := flag.String("o", "", "出力先ファイル (デフォルト: 標準出力)")
-	format := flag.String("format", "script", "出力形式: script | plain")
-	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
+	outputFile := flag.String("o", "", "output file")
+	format := flag.String("format", "script", "output format: script | plain")
+	flag.Usage = func() { fmt.Fprint(os.Stderr, usageText()) }
 	flag.Parse()
 
 	args := flag.Args()
 	if len(args) == 0 {
-		fmt.Fprint(os.Stderr, usage)
+		fmt.Fprint(os.Stderr, usageText())
 		os.Exit(1)
 	}
 
