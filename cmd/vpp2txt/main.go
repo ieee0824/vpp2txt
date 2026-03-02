@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ options:
   -format <type>  出力形式 (デフォルト: script)
                     script  : "話者名: テキスト" 形式
                     plain   : テキストのみ
+  -version        バージョンを表示
   -h              ヘルプを表示
 `
 
@@ -29,8 +31,16 @@ options:
   -format <type>  output format (default: script)
                     script  : "speaker: text" format
                     plain   : text only
+  -version        show version
   -h              show help
 `
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
+	return "dev"
+}
 
 func isJapanese() bool {
 	for _, key := range []string{"LC_ALL", "LC_MESSAGES", "LANG"} {
@@ -51,8 +61,14 @@ func usageText() string {
 func main() {
 	outputFile := flag.String("o", "", "output file")
 	format := flag.String("format", "script", "output format: script | plain")
+	showVersion := flag.Bool("version", false, "show version")
 	flag.Usage = func() { fmt.Fprint(os.Stderr, usageText()) }
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("vpp2txt %s\n", getVersion())
+		return
+	}
 
 	args := flag.Args()
 	if len(args) == 0 {
