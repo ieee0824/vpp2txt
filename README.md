@@ -5,6 +5,8 @@
 
 [Voice Peak](https://www.ah-soft.com/voice/) のプロジェクトファイル (`.vpp`) をテキストファイルに変換するコマンドラインツールです。
 
+[English](README_en.md)
+
 ## インストール
 
 ```bash
