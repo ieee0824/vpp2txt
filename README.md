@@ -1,6 +1,6 @@
 # vpp2txt
 
-[Voice Peak](https://www.ah-soft.com/voice-peak/) のプロジェクトファイル (`.vpp`) をテキストファイルに変換するコマンドラインツールです。
+[Voice Peak](https://www.ah-soft.com/voice/) のプロジェクトファイル (`.vpp`) をテキストファイルに変換するコマンドラインツールです。
 
 ## インストール
 
