@@ -1,5 +1,8 @@
 # vpp2txt
 
+[![CI](https://github.com/ieee0824/vpp2txt/actions/workflows/ci.yml/badge.svg)](https://github.com/ieee0824/vpp2txt/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ieee0824/vpp2txt/graph/badge.svg)](https://codecov.io/gh/ieee0824/vpp2txt)
+
 [Voice Peak](https://www.ah-soft.com/voice/) のプロジェクトファイル (`.vpp`) をテキストファイルに変換するコマンドラインツールです。
 
 ## インストール
