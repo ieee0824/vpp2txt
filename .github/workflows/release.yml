@@ -42,3 +42,79 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ matrix.name }}
+
+  update-homebrew:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release binaries
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          for arch in darwin-amd64 darwin-arm64 linux-amd64 linux-arm64; do
+            curl -sL "https://github.com/ieee0824/vpp2txt/releases/download/${TAG}/vpp2txt-${arch}" -o "vpp2txt-${arch}"
+          done
+
+      - name: Compute SHA256
+        run: |
+          echo "SHA256_DARWIN_AMD64=$(sha256sum vpp2txt-darwin-amd64 | awk '{print $1}')" >> $GITHUB_ENV
+          echo "SHA256_DARWIN_ARM64=$(sha256sum vpp2txt-darwin-arm64 | awk '{print $1}')" >> $GITHUB_ENV
+          echo "SHA256_LINUX_AMD64=$(sha256sum vpp2txt-linux-amd64  | awk '{print $1}')" >> $GITHUB_ENV
+          echo "SHA256_LINUX_ARM64=$(sha256sum vpp2txt-linux-arm64  | awk '{print $1}')" >> $GITHUB_ENV
+
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v4
+        with:
+          repository: ieee0824/homebrew-tap
+          ssh-key: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
+
+      - name: Update formula
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          cat > Formula/vpp2txt.rb <<EOF
+          class Vpp2txt < Formula
+            desc "Convert Voice Peak (.vpp) project files to text"
+            homepage "https://github.com/ieee0824/vpp2txt"
+            version "${VERSION}"
+
+            on_macos do
+              if Hardware::CPU.arm?
+                url "https://github.com/ieee0824/vpp2txt/releases/download/${TAG}/vpp2txt-darwin-arm64"
+                sha256 "${SHA256_DARWIN_ARM64}"
+              else
+                url "https://github.com/ieee0824/vpp2txt/releases/download/${TAG}/vpp2txt-darwin-amd64"
+                sha256 "${SHA256_DARWIN_AMD64}"
+              end
+            end
+
+            on_linux do
+              if Hardware::CPU.arm?
+                url "https://github.com/ieee0824/vpp2txt/releases/download/${TAG}/vpp2txt-linux-arm64"
+                sha256 "${SHA256_LINUX_ARM64}"
+              else
+                url "https://github.com/ieee0824/vpp2txt/releases/download/${TAG}/vpp2txt-linux-amd64"
+                sha256 "${SHA256_LINUX_AMD64}"
+              end
+            end
+
+            def install
+              bin.install Dir["vpp2txt-*"].first => "vpp2txt"
+            end
+
+            test do
+              assert_match "vpp2txt", shell_output("#{bin}/vpp2txt -version")
+            end
+          end
+          EOF
+
+      - name: Commit and push
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/vpp2txt.rb
+          git commit -m "feat: vpp2txt ${TAG}"
+          git push

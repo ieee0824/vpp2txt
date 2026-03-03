@@ -9,15 +9,23 @@ A command-line tool that converts [Voice Peak](https://www.ah-soft.com/voice/) p
 
 ## Installation
 
+### Homebrew (macOS / Linux)
+
+```bash
+brew install ieee0824/tap/vpp2txt
+```
+
+### Download binary
+
 Download a prebuilt binary for your OS from the [Releases page](https://github.com/ieee0824/vpp2txt/releases/latest).
 
-Or install with `go install`:
+### go install
 
 ```bash
 go install github.com/ieee0824/vpp2txt/cmd/vpp2txt@latest
 ```
 
-You can also clone and build from source:
+### Build from source
 
 ```bash
 git clone https://github.com/ieee0824/vpp2txt.git
